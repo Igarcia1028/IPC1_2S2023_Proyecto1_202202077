@@ -31,9 +31,28 @@ public class GestorNotas implements Serializable{
     }
     
     // Método para crear una nueva nota al curso
-    public void crearNota(Actividad actividad, Double punteo, Usuario alumno) {
+    public Nota crearNota(Actividad actividad, Double punteo, Usuario alumno) {
         Nota nuevaNota = new Nota(alumno, actividad, punteo);
         notas.add(nuevaNota);
+        return nuevaNota;
+    }
+    
+    public double obtenerPromedioNotasPorActividad(Actividad actividad) {
+        double sumaNotas = 0.0;
+        int cantidadNotas = 0;
+
+        for (Nota nota : notas) {
+            if (nota.getActividad().equals(actividad)) {
+                sumaNotas += nota.getValor();
+                cantidadNotas++;
+            }
+        }
+
+        if (cantidadNotas > 0) {
+            return sumaNotas / cantidadNotas;
+        } else {
+            return 0.0; // Si no hay notas para la actividad, el promedio es 0.
+        }
     }
     
     //Método para obtener la nota

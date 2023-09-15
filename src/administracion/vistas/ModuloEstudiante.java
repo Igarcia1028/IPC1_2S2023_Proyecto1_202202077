@@ -112,7 +112,8 @@ public class ModuloEstudiante extends javax.swing.JFrame {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     // Al hacer clic en el mosaico, abre la nueva ventana de detalle del curso
-                    //abrirVentanaDetalleCurso(curso.getCodigo());
+                    Usuario alumno = gestorUsuarios.obtenerUsuarioByCodigo(gestorUsuarios.getUsuarioLogueado().getCodigo());
+                    abrirVentanaDetalleCurso(curso, alumno);
                 }
             });
         // Agrega los componentes al mosaico
@@ -125,6 +126,17 @@ public class ModuloEstudiante extends javax.swing.JFrame {
     private ArrayList<Curso> obtenerCursosDelAlumno(Usuario alumno) {
          ArrayList<Curso> cursos = gestorCursos.getCursosDelAlumno(alumno);
          return cursos;
+    }
+    
+    private void abrirVentanaDetalleCurso(Curso curso, Usuario alumno) {
+        if (curso != null) {
+            // Crea una nueva instancia de la ventana de detalle del curso y pásale el objeto Curso
+            VentanaDetalleCursoAlumno ventanaDetalle = new VentanaDetalleCursoAlumno(alumno, curso);
+            //ventanaDetalle.RecibirPanel(this);
+            ventanaDetalle.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Curso no encontrado", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
     
     /**

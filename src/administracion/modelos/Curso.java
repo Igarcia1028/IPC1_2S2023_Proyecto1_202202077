@@ -111,4 +111,13 @@ public class Curso implements Serializable {
     public void eliminarAlumno(Usuario alumno) {
        alumnos.remove(alumno);
     }
+    
+    public Actividad getActividadByCodigo(String codActividad){
+        for(Actividad actividadI: actividades){
+            if(actividadI != null && actividadI.getCodigo().equals(codActividad)){
+                return actividadI;
+            }
+        }
+        return null;
+    }
 }

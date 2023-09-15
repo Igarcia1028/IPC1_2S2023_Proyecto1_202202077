@@ -14,12 +14,12 @@ import java.io.Serializable;
 public class Nota implements Serializable{
     private Usuario alumno;
     private Actividad actividad;
-    private double nota;
+    private double valor;
 
     public Nota(Usuario alumno, Actividad actividad, double nota) {
         this.alumno = alumno;
         this.actividad = actividad;
-        this.nota = nota;
+        this.valor = nota;
     }
 
     public Usuario getAlumno() {
@@ -38,11 +38,11 @@ public class Nota implements Serializable{
         this.actividad = actividad;
     }
 
-    public double getNota() {
-        return nota;
+    public double getValor() {
+        return valor;
     }
 
-    public void setNota(double nota) {
-        this.nota = nota;
+    public void setValor(double nota) {
+        this.valor = nota;
     }
 }

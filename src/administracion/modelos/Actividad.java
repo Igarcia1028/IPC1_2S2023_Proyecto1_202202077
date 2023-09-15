@@ -12,16 +12,25 @@ import java.util.ArrayList;
  * @author dg551
  */
 public class Actividad implements Serializable{
+   private static int contadorCodigo = 0; // Variable estática para llevar el registro del último código asignado
     private String nombre;
     private String descripcion;
     private double ponderacion;
     private double nota;
+    private String codigo;
 
     public Actividad(String nombre, String descripcion, double ponderacion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.ponderacion = ponderacion;
         this.nota = 0.0;
+        this.codigo = generarCodigoUnico();
+    }
+
+    // Método privado para generar un código único autoincrementable
+    private String generarCodigoUnico() {
+        contadorCodigo++;
+        return "ACT_" + contadorCodigo;
     }
 
     public String getNombre() {
@@ -55,4 +64,14 @@ public class Actividad implements Serializable{
     public void setNota(double nota) {
         this.nota = nota;
     }
+
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
+    }
+    
+    
 }

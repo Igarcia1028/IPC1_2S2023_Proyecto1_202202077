@@ -6,7 +6,9 @@ package Archivos;
 
 import administracion.controladores.GestorCursos;
 import administracion.controladores.GestorNotas;
+import administracion.modelos.Actividad;
 import administracion.modelos.Nota;
+import administracion.modelos.Curso;
 import autenticacion.controladores.GestorUsuarios;
 import autenticacion.modelos.Roles;
 import autenticacion.modelos.Usuario;
@@ -24,6 +26,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class Texto {
 
     GestorUsuarios gestorUsuario = GestorUsuarios.getInstancia();
+    GestorNotas gestorNota = GestorNotas.getInstancia();
+
     public Texto() {
     }
     
@@ -222,47 +226,47 @@ public class Texto {
     }
     
     
-//    public void cargarNotasAlumno(String path, GestorCursos curso, String codCurso){
-//        try {
-//            FileReader fr = new FileReader (path);
-//            BufferedReader br = new BufferedReader(fr);
-//            
-//            String linea = "";
-//            String contenido= "";
-//            
-//            while((linea=br.readLine()) != null) {
-//                contenido += linea+"\n";
-//            }
-//            
-//            br.close();
-//            fr.close();
-//            System.out.println(contenido);
-//            cargarDatosNotasAlumno(contenido, curso, codCurso);
-//        } catch (Exception e) {
-//        
-//        }
-//    }
+    public void cargarNotasAlumno(String path, GestorCursos gestorCurso, Curso curso, Actividad actividad){
+        try {
+            FileReader fr = new FileReader (path);
+            BufferedReader br = new BufferedReader(fr);
+            
+            String linea = "";
+            String contenido= "";
+            
+            while((linea=br.readLine()) != null) {
+                contenido += linea+"\n";
+            }
+            
+            br.close();
+            fr.close();
+            System.out.println(contenido);
+            cargarDatosNotasAlumno(contenido, gestorCurso, curso, actividad);
+        } catch (Exception e) {
+        
+        }
+    }
 //    
-//    private void cargarDatosNotasAlumno(String contenido, GestorCursos curso, String codCurso, GestorNotas nota){
-//        String [] listado = contenido.split("\n");
-//        int cant = listado.length;
-//        String codigo;
-//        Double punteo;
-//        Usuario alumnoObtenido; 
-//        Nota notaCreada;
-//        
-//        for (int i = 0; i < cant; i++) {
-//            System.out.println(listado[i]);
-//            String [] valores = listado[i].split(",");
-//            
-//            codigo = valores[0];
-//            punteo = convertDouble(valores[1]);
-//            
-//            alumnoObtenido = gestorUsuario.obtenerUsuarioByCodigo(codigo);
-//            notaCreada = GestorNotas.
-//            curso.agregarNotaACurso(codCurso, punteo, alumnoObtenido);
-//        }
-//    }
+    private void cargarDatosNotasAlumno(String contenido, GestorCursos gestorCurso, Curso curso, Actividad actividad){
+        String [] listado = contenido.split("\n");
+        int cant = listado.length;
+        String codigo;
+        Double punteo;
+        Usuario alumnoObtenido; 
+        Nota notaCreada;
+        
+        for (int i = 0; i < cant; i++) {
+            System.out.println(listado[i]);
+            String [] valores = listado[i].split(",");
+            
+            codigo = valores[0];
+            punteo = convertDouble(valores[1]);
+            
+            alumnoObtenido = gestorUsuario.obtenerUsuarioByCodigo(codigo);
+            notaCreada = gestorNota.crearNota(actividad, punteo, alumnoObtenido);
+            gestorCurso.agregarNotaACurso(curso.getCodigo(), notaCreada);
+        }
+    }
     
     public int convertNum(String val){
         try {

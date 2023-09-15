@@ -8,6 +8,7 @@ import Archivos.Binario;
 import Archivos.Texto;
 import administracion.controladores.GestorCampos;
 import administracion.controladores.GestorCursos;
+import administracion.controladores.GestorNotas;
 import administracion.modelos.Actividad;
 import administracion.modelos.Curso;
 import autenticacion.controladores.GestorUsuarios;
@@ -34,6 +35,7 @@ public class VentanaDetalleCurso extends javax.swing.JFrame {
     Texto texto;
     GestorUsuarios gestorUsuario = GestorUsuarios.getInstancia();
     GestorCursos gestorCurso = GestorCursos.getInstancia();
+    GestorNotas gestorNota = GestorNotas.getInstancia();
     
     DefaultTableModel modelAlumno;
     DefaultTableModel modelActividad;
@@ -73,10 +75,11 @@ public class VentanaDetalleCurso extends javax.swing.JFrame {
 
         for(int i = 0; i < lstActividades.size(); i ++){
             Object[] row = new Object[5];
-            row[0] = lstActividades.get(i).getNombre();
-            row[1] = lstActividades.get(i).getDescripcion();
-            row[2] = lstActividades.get(i).getPonderacion();
-            row[3] = 0;
+            row[0] = lstActividades.get(i).getCodigo();
+            row[1] = lstActividades.get(i).getNombre();
+            row[2] = lstActividades.get(i).getDescripcion();
+            row[3] = lstActividades.get(i).getPonderacion();
+            row[4] = gestorNota.obtenerPromedioNotasPorActividad(lstActividades.get(i));
             modelActividad.addRow(row);
         }
     }
@@ -104,11 +107,9 @@ public class VentanaDetalleCurso extends javax.swing.JFrame {
         btnPeorRendimiento1 = new javax.swing.JButton();
         lblReportes1 = new javax.swing.JLabel();
         lblDescripcionActividad = new javax.swing.JLabel();
-        lblNotas = new javax.swing.JLabel();
-        btnSeleccionarNotas = new javax.swing.JButton();
         lblPonderacion = new javax.swing.JLabel();
         lblReportes5 = new javax.swing.JLabel();
-        lblAcumuladoCantidad = new javax.swing.JLabel();
+        lblAcumulado = new javax.swing.JLabel();
         lblReportes2 = new javax.swing.JLabel();
         lblReportes3 = new javax.swing.JLabel();
         lblAcumulado1 = new javax.swing.JLabel();
@@ -162,9 +163,14 @@ public class VentanaDetalleCurso extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Nombre", "Descripción", "Ponderación", "Promedio"
+                "Codigo", "Nombre", "Descripción", "Ponderación", "Promedio"
             }
         ));
+        tblActividades.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblActividadesMouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(tblActividades);
 
         btnPeorRendimiento1.setText("Top 5 - Estudiantes con Peor Rendimiento");
@@ -179,20 +185,13 @@ public class VentanaDetalleCurso extends javax.swing.JFrame {
 
         lblDescripcionActividad.setText("Descripción");
 
-        lblNotas.setText("Notas");
-
-        btnSeleccionarNotas.setText("Seleccionar archivo CSV");
-        btnSeleccionarNotas.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSeleccionarNotasActionPerformed(evt);
-            }
-        });
-
         lblPonderacion.setText("Ponderación");
 
         lblReportes5.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblReportes5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblReportes5.setText("Crear Actividad");
+
+        lblAcumulado.setText("Acumulado");
 
         lblReportes2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lblReportes2.setText("Listado Alumnos");
@@ -228,11 +227,7 @@ public class VentanaDetalleCurso extends javax.swing.JFrame {
                                         .addComponent(lblPonderacion, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(txtPonderacionActividad, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(lblNotas, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnSeleccionarNotas, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE))
-                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                             .addComponent(lblNombreActividad, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -252,8 +247,8 @@ public class VentanaDetalleCurso extends javax.swing.JFrame {
                                         .addGap(121, 121, 121))
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                         .addComponent(lblAcumulado1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(lblAcumuladoCantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(lblAcumulado, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(129, 129, 129))))))))
         );
         layout.setVerticalGroup(
@@ -272,7 +267,7 @@ public class VentanaDetalleCurso extends javax.swing.JFrame {
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblAcumuladoCantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblAcumulado, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblAcumulado1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblReportes5, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -285,8 +280,10 @@ public class VentanaDetalleCurso extends javax.swing.JFrame {
                         .addGap(18, 18, Short.MAX_VALUE)
                         .addComponent(btnMejorRendimiento, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnPeorRendimiento1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(24, 24, 24))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnPeorRendimiento1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnCrearActividad, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(20, 20, 20))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lblNombreActividad, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -299,13 +296,7 @@ public class VentanaDetalleCurso extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtPonderacionActividad, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblPonderacion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btnSeleccionarNotas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblNotas, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnCrearActividad, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())))
+                        .addGap(87, 87, 87))))
         );
 
         pack();
@@ -321,6 +312,7 @@ public class VentanaDetalleCurso extends javax.swing.JFrame {
         //ListarProfesores(binario.obtener());
         ListarAlumnos(gestorUsuario.getAlumnosDelCurso(cursoActual));
         moduloProfesor.setCantidadAlumnos(cursoActual.getCantidadAlumnos());
+        guardarBinarioCurso();
     }//GEN-LAST:event_btnCargaMasivaAlumnos1ActionPerformed
 
     private void btnCrearActividadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCrearActividadActionPerformed
@@ -383,22 +375,30 @@ public class VentanaDetalleCurso extends javax.swing.JFrame {
     
     public void actualizarAcumulado(){
         Double sumaPonderacion = gestorCurso.obtenerSumaPonderaciones(gestorCurso.obtenerActividadesDeCurso(cursoActual.getCodigo()));
-        lblAcumuladoCantidad.setText(sumaPonderacion+"/100");
+        lblAcumulado.setText(sumaPonderacion+"/100");
     }
     
     private void btnPeorRendimiento1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPeorRendimiento1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnPeorRendimiento1ActionPerformed
 
-    private void btnSeleccionarNotasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSeleccionarNotasActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnSeleccionarNotasActionPerformed
+    private void tblActividadesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblActividadesMouseClicked
+        modelActividad = (DefaultTableModel)tblActividades.getModel();
+        int selectedRow = tblActividades.getSelectedRow();
+        Actividad actividad = cursoActual.getActividadByCodigo(modelActividad.getValueAt(selectedRow, 0).toString());
+        String path = texto.Buscar();
+        
+        texto.cargarNotasAlumno(path, gestorCurso, cursoActual, actividad);
+        ListarActividades(gestorCurso.obtenerActividadesDeCurso(cursoActual.getCodigo()));
+        
+        guardarBinarioCurso();
+    }//GEN-LAST:event_tblActividadesMouseClicked
 
     private void tblAlumnosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblAlumnosMouseClicked
-        DefaultTableModel model = (DefaultTableModel)tblAlumnos.getModel();
+        modelAlumno = (DefaultTableModel)tblAlumnos.getModel();
         int selectedRow = tblAlumnos.getSelectedRow();
         
-        Usuario profesor = gestorUsuario.obtenerUsuarioByCodigo(model.getValueAt(selectedRow, 0).toString());
+        Usuario profesor = gestorUsuario.obtenerUsuarioByCodigo(modelAlumno.getValueAt(selectedRow, 0).toString());
         VentanaMasInformacionEstudiante vtnActualizar = new VentanaMasInformacionEstudiante();
         vtnActualizar.llenarTextField(profesor.getCodigo(), profesor.getNombre(), profesor.getApellido(),
             profesor.getCorreo(), String.valueOf(profesor.getGenero()), profesor.getContrasena(), profesor, cursoActual);
@@ -449,15 +449,13 @@ public class VentanaDetalleCurso extends javax.swing.JFrame {
     private javax.swing.JButton btnCrearActividad;
     private javax.swing.JButton btnMejorRendimiento;
     private javax.swing.JButton btnPeorRendimiento1;
-    private javax.swing.JButton btnSeleccionarNotas;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lblAcumulado;
     private javax.swing.JLabel lblAcumulado1;
-    private javax.swing.JLabel lblAcumuladoCantidad;
     private javax.swing.JLabel lblDescripcionActividad;
     private javax.swing.JLabel lblNombreActividad;
     private javax.swing.JLabel lblNombreCurso;
-    private javax.swing.JLabel lblNotas;
     private javax.swing.JLabel lblPonderacion;
     private javax.swing.JLabel lblReportes1;
     private javax.swing.JLabel lblReportes2;
